@@ -40,6 +40,22 @@ const generateId = (elType = "row") => {
   return `${timestamp}-${random}-${randomString}-${elType}`;
 };
 
+const numberToWord = (number) => {
+  const words = [
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
+  ];
+  return words[number - 1];
+};
+
 const generateBaseRow = () => {
   return {
     id: generateId(),
@@ -47,6 +63,7 @@ const generateBaseRow = () => {
     columns: [
       {
         id: generateId("column"),
+        colSize: 1,
         element: null,
       },
     ],
@@ -55,6 +72,7 @@ const generateBaseRow = () => {
 
 // Constants
 const maxRows = 6;
+const maxColumns = 12;
 const padding = 75;
 const paperHeight = 1400 * 1.41451 - padding;
 const zoomStep = 0.05;
@@ -109,6 +127,7 @@ function App() {
   const paperRef = useRef(null);
 
   // Hooks
+  // eslint-disable-next-line no-unused-vars
   const [image, takeScreenShot] = useScreenshot({
     type: "image/jpeg",
     quality: 1.0,
@@ -228,14 +247,16 @@ const BaseRow = ({
   form,
 }) => {
   // Sizes
-  const colSize = 12 / row.columns.length;
+  const sumOfColSizes = row.columns.reduce((acc, col) => acc + col.colSize, 0);
   const sumOfRowSizes = rows.reduce((acc, row) => acc + row.rowSize, 0);
   const height =
     (paperHeight - form.values.verticalSpace * (sumOfRowSizes - 1)) *
     (row.rowSize / sumOfRowSizes);
 
   // Refs
-  const modalRef = useRef(null);
+  const modalRowRef = useRef(null);
+  const modalColRef = useRef(null);
+
   return (
     <div
       className={Style.rowContainer}
@@ -243,7 +264,7 @@ const BaseRow = ({
         height: height,
       }}
     >
-      <RowMenu setRows={setRows} row={row} rows={rows} modalRef={modalRef} />
+      <RowMenu setRows={setRows} row={row} rows={rows} modalRef={modalRowRef} />
       <Row
         className={Style.baseRow}
         columnGap={{
@@ -256,9 +277,16 @@ const BaseRow = ({
         }}
       >
         {row.columns.map((column, index) => {
+          const colSize = (maxColumns / sumOfColSizes) * column.colSize;
+
           return (
             <Col key={index} xs={colSize} className={Style.baseCol}>
-              <ColMenu setRows={setRows} column={column} />
+              <ColMenu
+                row={row}
+                setRows={setRows}
+                column={column}
+                modalRef={modalColRef}
+              />
               {column.element ? (
                 React.createElement(componentIds[column.element], {
                   rows: { rows },
@@ -324,6 +352,7 @@ const RowMenu = ({ row, rows, setRows, modalRef }) => {
               newRows[rowIndex].columns.push({
                 id: generateId("column"),
                 element: null,
+                colSize: 1,
               });
               return newRows;
             });
@@ -350,25 +379,56 @@ const RowMenu = ({ row, rows, setRows, modalRef }) => {
   );
 };
 
-const ColMenu = ({ column, setRows }) => {
+const ColMenu = ({ column, row, setRows, modalRef }) => {
+  const modalBody = (
+    <ColSettings
+      row={row}
+      column={column}
+      setRows={setRows}
+      modalRef={modalRef}
+    />
+  );
   return (
     <span className={Style.menuColButtonsContainer}>
+      <MagicModal ref={modalRef} />
       <span>
         <IoIosRemoveCircleOutline
           className={Style.menuIcons}
           onClick={() => {
-            // Remove this column
-            setRows((rows) => {
-              const newRows = [...rows];
-              const rowIndex = newRows.findIndex((r) =>
-                r.columns.find((c) => c.id === column.id)
-              );
-              const columnIndex = newRows[rowIndex].columns.findIndex(
-                (c) => c.id === column.id
-              );
-              newRows[rowIndex].columns.splice(columnIndex, 1);
-              return newRows;
-            });
+            if (column.element === null) {
+              setRows((rows) => {
+                const newRows = [...rows];
+                const rowIndex = newRows.findIndex((r) =>
+                  r.columns.find((c) => c.id === column.id)
+                );
+                const columnIndex = newRows[rowIndex].columns.findIndex(
+                  (c) => c.id === column.id
+                );
+                newRows[rowIndex].columns.splice(columnIndex, 1);
+                return newRows;
+              });
+            } else {
+              setRows((rows) => {
+                const newRows = [...rows];
+                const rowIndex = newRows.findIndex((r) =>
+                  r.columns.find((c) => c.id === column.id)
+                );
+                const columnIndex = newRows[rowIndex].columns.findIndex(
+                  (c) => c.id === column.id
+                );
+                newRows[rowIndex].columns[columnIndex].element = null;
+                return newRows;
+              });
+            }
+          }}
+        />
+      </span>
+      {/* settings */}
+      <span>
+        <IoMdSettings
+          className={Style.menuIcons}
+          onClick={() => {
+            modalRef.current.updateBody(modalBody);
           }}
         />
       </span>
@@ -377,6 +437,21 @@ const ColMenu = ({ column, setRows }) => {
 };
 
 const RowSettings = ({ row, setRows, modalRef, rows }) => {
+  const numberFormatter = (value) => {
+    const tmpValue = parseInt(value.replace(/[^0-9]/g, "")) || 1;
+    const sumOfRowSizes = rows.reduce((acc, row) => acc + row.rowSize, 0);
+    const maxValueAccepted = maxRows - sumOfRowSizes + row.rowSize;
+    if (tmpValue > maxValueAccepted) {
+      return maxValueAccepted;
+    } else if (value === "") {
+      return "";
+    } else if (value === 0) {
+      return 1;
+    } else {
+      return tmpValue;
+    }
+  };
+
   const form = useForm({
     inputs: {
       rowSize: {
@@ -388,19 +463,7 @@ const RowSettings = ({ row, setRows, modalRef, rows }) => {
           else return [true, ""];
         },
         formatter: (value) => {
-          const tmpValue = parseInt(value.replace(/[^0-9]/g, "")) || 1;
-          const sumOfRowSizes = rows.reduce((acc, row) => acc + row.rowSize, 0);
-          const maxValueAccepted = maxRows - sumOfRowSizes + row.rowSize;
-
-          if (tmpValue > maxValueAccepted) {
-            return maxValueAccepted;
-          } else if (value === "") {
-            return "";
-          } else if (value === 0) {
-            return 1;
-          } else {
-            return tmpValue;
-          }
+          return numberFormatter(value, maxRows);
         },
       },
     },
@@ -408,23 +471,106 @@ const RowSettings = ({ row, setRows, modalRef, rows }) => {
 
   return (
     <div>
-      <InputField {...form.getInputProps("rowSize")} />
-      <Button
-        onClick={() => {
-          // Update rowSize in this row
-          setRows((rows) => {
-            const newRows = [...rows];
-            const rowIndex = newRows.findIndex((r) => r.id === row.id);
-            newRows[rowIndex].rowSize = parseInt(form.values.rowSize);
-            return newRows;
-          });
+      <div className={Style.modalSection}>
+        <h3>Row Size</h3>
+        <p>
+          Insert the row size do you prefer. You can create maximum {maxRows}{" "}
+          rows with size 1 or different combination of rows with different
+          sizes. (ex. One row with size 2 and {numberToWord(maxRows - 2)} rows
+          with size 1). The row size increase the height of the row.
+        </p>
+        <InputField {...form.getInputProps("rowSize")} />
+      </div>
+      <div className={Style.buttonContainer}>
+        <Button
+          onClick={() => {
+            // update row size
+            setRows((rows) => {
+              const newRows = [...rows];
+              const rowIndex = newRows.findIndex((r) => r.id === row.id);
+              newRows[rowIndex].rowSize = form.values.rowSize;
+              return newRows;
+            });
 
-          // Close modal
-          modalRef.current.hide();
-        }}
-      >
-        Confirm
-      </Button>
+            modalRef.current.hide();
+          }}
+        >
+          Confirm Changes
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const ColSettings = ({ column, row, setRows, modalRef }) => {
+  const numberFormatter = (value) => {
+    const tmpValue = parseInt(value.replace(/[^0-9]/g, "")) || 1;
+    const sumOfColSizes = row.columns.reduce(
+      (acc, col) => acc + col.colSize,
+      0
+    );
+    const maxValueAccepted = maxColumns - sumOfColSizes + column.colSize;
+    if (tmpValue > maxValueAccepted) {
+      return maxValueAccepted;
+    } else if (value === "") {
+      return "";
+    } else if (value === 0) {
+      return 1;
+    } else {
+      return tmpValue;
+    }
+  };
+
+  const form = useForm({
+    inputs: {
+      colSize: {
+        value: column.colSize,
+        validator: (value) => {
+          if (value === "") return [false, "Column size is required"];
+          else if (value === 0)
+            return [false, "Column size must be greater than 0"];
+          else return [true, ""];
+        },
+        formatter: numberFormatter,
+      },
+    },
+  });
+
+  return (
+    <div>
+      <div className={Style.modalSection}>
+        <h3>Column Size</h3>
+        <p>
+          Insert the column size do you prefer. You can create maximum{" "}
+          {maxColumns} columns with size 1 or different combination of columns
+          with different sizes. (ex. One column with size 2 and{" "}
+          {numberToWord(maxColumns - 2)} columns with size 1). The column size
+          increase the width of the column.
+        </p>
+        <InputField {...form.getInputProps("colSize")} />
+      </div>
+      <div className={Style.buttonContainer}>
+        <Button
+          onClick={() => {
+            // update col size
+            setRows((rows) => {
+              const newRows = [...rows];
+              const rowIndex = newRows.findIndex((r) => r.id === row.id);
+              const columnIndex = newRows[rowIndex].columns.findIndex(
+                (c) => c.id === column.id
+              );
+              newRows[rowIndex].columns[columnIndex].colSize = parseInt(
+                form.values.colSize
+              );
+              return newRows;
+            });
+            form.reset();
+            modalRef.current.destroy();
+          }}
+        >
+          Confirm Changes
+        </Button>
+      </div>
     </div>
   );
 };

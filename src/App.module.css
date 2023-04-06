@@ -97,6 +97,15 @@
   opacity: 1;
 }
 
+.modalSection .inputLabel {
+  font-size: 14px;
+}
+
+.modalSection .inputLabel p {
+  margin: 0;
+  margin-bottom: 4px;
+}
+
 /* Media query xs */
 @media (max-width: 600px) {
   .settingsMenu {
@@ -149,7 +158,7 @@
 .menuColButtonsContainer {
   position: absolute;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   top: 10px;
@@ -180,6 +189,24 @@
 }
 
 /* ########## END BUTTONS MENU ########## */
+
+/* ########## ROW SETTING MODAL ########## */
+
+.modalSection {
+  padding: 20px;
+}
+
+.modalSection p {
+  margin-block: 5px 15px;
+  font-size: 14px;
+}
+
+.buttonContainer {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* ########## END ROW SETTING MODAL ########## */
 
 /* ########## BASE ROW/COL STYLE ########## */
 
