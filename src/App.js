@@ -24,6 +24,8 @@ import {
   IoIosRemoveCircleOutline,
 } from "react-icons/io";
 import { RxCrossCircled } from "react-icons/rx";
+import { BiZoomIn, BiZoomOut } from "react-icons/bi";
+import { MdCenterFocusStrong } from "react-icons/md";
 
 // Styles
 import Style from "./App.module.css";
@@ -53,6 +55,9 @@ const generateBaseRow = () => {
 const maxRows = 6;
 const padding = 75;
 const paperHeight = 1400 * 1.41451 - padding;
+const zoomStep = 0.05;
+const zoomMax = 1.5;
+const zoomMin = 0.3;
 
 const componentIds = {
   lineChart: LineChart,
@@ -102,16 +107,21 @@ function App() {
 
   // Effects
   useEffect(() => {
-    console.log(zoom);
     zoomRef.current.style.zoom = zoom;
   }, [zoom]);
 
   useEffect(() => {
     focusRef.current.focus();
+    focusRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+      inline: "center",
+    });
   }, []);
   return (
     <ThemeProvider>
       <MouseDrag>
+        <GlobalSettings zoom={zoom} setZoom={setZoom} focusRef={focusRef} />
         <div ref={zoomRef} className={Style.mainContainer}>
           <div className={Style.globalBuilderMenu}>
             <div className={Style.focusInput}>
@@ -125,43 +135,12 @@ function App() {
               Log Rows
             </Button>
             <Button
-              onClick={() => {
-                focusRef.current.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                  inline: "center",
-                });
-              }}
-            >
-              Center
-            </Button>
-            <Button
-              onClick={() => {
-                setZoom((zoom) => {
-                  return zoom + 0.03;
-                });
-              }}
-            >
-              Zoom in
-            </Button>
-
-            <Button
-              onClick={() => {
-                setZoom((zoom) => {
-                  return zoom - 0.03;
-                });
-              }}
-            >
-              Zoom out
-            </Button>
-            <Button
               disabled={rows.length >= maxRows}
               onClick={() => {
                 const sumOfRowSizes = rows.reduce(
                   (acc, row) => acc + row.rowSize,
                   0
                 );
-
                 if (sumOfRowSizes >= maxRows) return;
                 setRows((rows) => {
                   const newRows = [...rows];
@@ -426,6 +405,94 @@ const RowSettings = ({ row, setRows, modalRef, rows }) => {
       >
         Confirm
       </Button>
+    </div>
+  );
+};
+
+const GlobalSettings = ({ zoom, setZoom, focusRef }) => {
+  const [zoomIsChanging, setZoomIsChanging] = useState(null);
+  const [autoCenterOnZoom, setAutoCenterOnZoom] = useState(true);
+
+  useEffect(() => {
+    if (autoCenterOnZoom) {
+      if (zoomIsChanging) {
+        const timeout = setTimeout(() => {
+          setZoomIsChanging(false);
+        }, 750);
+        return () => clearTimeout(timeout);
+      } else if (zoomIsChanging === false) {
+        focusRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+          inline: "center",
+        });
+        setZoomIsChanging(null);
+      }
+    }
+  }, [zoomIsChanging, autoCenterOnZoom]);
+
+  return (
+    <div className={Style.settingsMenu}>
+      <div
+        className={Style.settingComponent}
+        style={{
+          opacity: zoom >= zoomMax ? 0.5 : 1,
+        }}
+        onClick={() => {
+          if (zoom >= zoomMax) return;
+          setZoom((zoom) => {
+            return zoom + zoomStep;
+          });
+          setZoomIsChanging(true);
+        }}
+      >
+        <BiZoomIn />
+      </div>
+      <div
+        className={Style.settingComponent}
+        style={{
+          opacity: zoom <= zoomMin ? 0.5 : 1,
+        }}
+        onClick={() => {
+          if (zoom <= zoomMin) return;
+          setZoom((zoom) => {
+            return zoom - zoomStep;
+          });
+          setZoomIsChanging(true);
+        }}
+      >
+        <BiZoomOut />
+      </div>
+      <div
+        className={Style.settingComponent}
+        onClick={() => {
+          focusRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+            inline: "center",
+          });
+        }}
+      >
+        <MdCenterFocusStrong />
+      </div>
+      <div
+        className={Style.settingComponent}
+        onClick={() => {
+          setAutoCenterOnZoom(!autoCenterOnZoom);
+        }}
+      >
+        <div className={Style.settingsTooltip}>
+          <p>Enable auto center on zoom</p>
+        </div>
+        <input
+          style={{ cursor: "pointer" }}
+          type="checkbox"
+          checked={autoCenterOnZoom}
+          onChange={(e) => {
+            setAutoCenterOnZoom(e.target.checked);
+          }}
+        />
+      </div>
     </div>
   );
 };
