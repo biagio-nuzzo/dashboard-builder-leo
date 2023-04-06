@@ -257,7 +257,7 @@ const BaseRow = ({
       >
         {row.columns.map((column, index) => {
           return (
-            <Col key={index} sm={colSize} className={Style.baseCol}>
+            <Col key={index} xs={colSize} className={Style.baseCol}>
               <ColMenu setRows={setRows} column={column} />
               {column.element ? (
                 React.createElement(componentIds[column.element], {

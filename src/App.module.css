@@ -93,9 +93,16 @@
   opacity: 0;
 }
 
-/* show settingsTooltip on settingComponent hover */
 .settingComponent:hover .settingsTooltip {
   opacity: 1;
+}
+
+/* Media query xs */
+@media (max-width: 600px) {
+  .settingsMenu {
+    bottom: 5px;
+    right: 5px;
+  }
 }
 
 /* ########## END SETTINGS MENU ########## */
