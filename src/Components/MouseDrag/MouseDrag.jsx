@@ -49,8 +49,6 @@ const MouseDrag = ({ children, style }) => {
         const y = e.pageY - e.currentTarget.offsetTop;
         const walkY = (y - startY) * 1;
         e.currentTarget.scrollTop = scrollDown - walkY;
-
-        console.log(scrollDown + walkY);
       }}
     >
       {children}

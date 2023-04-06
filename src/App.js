@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 // Libraries
 import {
@@ -8,6 +8,7 @@ import {
   Button,
   InputField,
   Select,
+  MagicModal,
 } from "@hybris-software/ui-kit";
 import useForm from "@hybris-software/use-ful-form";
 
@@ -38,6 +39,7 @@ const generateId = (elType = "row") => {
 const generateBaseRow = () => {
   return {
     id: generateId(),
+    rowSize: 1,
     columns: [
       {
         id: generateId("column"),
@@ -48,12 +50,14 @@ const generateBaseRow = () => {
 };
 
 // Constants
+const maxRows = 6;
+const padding = 75;
+const paperHeight = 1400 * 1.41451 - padding;
+
 const componentIds = {
   lineChart: LineChart,
   barChart: BarChart,
 };
-
-const maxRows = 6;
 
 function App() {
   const [rows, setRows] = useState([]);
@@ -103,7 +107,12 @@ function App() {
             <Button
               disabled={rows.length >= maxRows}
               onClick={() => {
-                if (rows.length >= maxRows) return;
+                const sumOfRowSizes = rows.reduce(
+                  (acc, row) => acc + row.rowSize,
+                  0
+                );
+
+                if (sumOfRowSizes >= maxRows) return;
                 setRows((rows) => {
                   const newRows = [...rows];
                   newRows.push(generateBaseRow());
@@ -169,17 +178,27 @@ const BaseRow = ({
   componentsList,
   form,
 }) => {
+  // Sizes
   const colSize = 12 / row.columns.length;
-  const height = `calc(100% / ${rows.length > 1 ? rows.length : 1})`;
 
+  const sumOfRowSizes = rows.reduce((acc, row) => acc + row.rowSize, 0);
+
+  const height =
+    (paperHeight - form.values.verticalSpace * (sumOfRowSizes - 1)) *
+    (row.rowSize / sumOfRowSizes);
+
+  console.log(height);
+
+  // Refs
+  const modalRef = useRef(null);
   return (
     <div
       className={Style.rowContainer}
       style={{
-        maxHeight: height,
+        height: height,
       }}
     >
-      <RowMenu setRows={setRows} row={row} />
+      <RowMenu setRows={setRows} row={row} rows={rows} modalRef={modalRef} />
       <Row
         className={Style.baseRow}
         columnGap={{
@@ -243,9 +262,13 @@ const BaseColContent = ({ setRows, column, row, componentsList }) => {
   );
 };
 
-const RowMenu = ({ row, setRows }) => {
+const RowMenu = ({ row, rows, setRows, modalRef }) => {
+  const modalBody = (
+    <RowSettings row={row} setRows={setRows} modalRef={modalRef} rows={rows} />
+  );
   return (
     <span className={Style.menuRowButtonsContainer}>
+      <MagicModal ref={modalRef} />
       <span>
         <IoMdAddCircleOutline
           className={Style.menuIcons}
@@ -263,7 +286,12 @@ const RowMenu = ({ row, setRows }) => {
         />
       </span>
       <span>
-        <IoMdSettings className={Style.menuIcons} />
+        <IoMdSettings
+          className={Style.menuIcons}
+          onClick={() => {
+            modalRef.current.updateBody(modalBody);
+          }}
+        />
       </span>
       <span>
         <RxCrossCircled
@@ -300,6 +328,59 @@ const ColMenu = ({ column, setRows }) => {
         />
       </span>
     </span>
+  );
+};
+
+const RowSettings = ({ row, setRows, modalRef, rows }) => {
+  const form = useForm({
+    inputs: {
+      rowSize: {
+        value: row.rowSize,
+        validator: (value) => {
+          if (value === "") return [false, "Row size is required"];
+          else if (value === 0)
+            return [false, "Row size must be greater than 0"];
+          else return [true, ""];
+        },
+        formatter: (value) => {
+          const tmpValue = parseInt(value.replace(/[^0-9]/g, "")) || 1;
+          const sumOfRowSizes = rows.reduce((acc, row) => acc + row.rowSize, 0);
+          const maxValueAccepted = maxRows - sumOfRowSizes + row.rowSize;
+
+          if (tmpValue > maxValueAccepted) {
+            return maxValueAccepted;
+          } else if (value === "") {
+            return "";
+          } else if (value === 0) {
+            return 1;
+          } else {
+            return tmpValue;
+          }
+        },
+      },
+    },
+  });
+
+  return (
+    <div>
+      <InputField {...form.getInputProps("rowSize")} />
+      <Button
+        onClick={() => {
+          // Update rowSize in this row
+          setRows((rows) => {
+            const newRows = [...rows];
+            const rowIndex = newRows.findIndex((r) => r.id === row.id);
+            newRows[rowIndex].rowSize = parseInt(form.values.rowSize);
+            return newRows;
+          });
+
+          // Close modal
+          modalRef.current.hide();
+        }}
+      >
+        Confirm
+      </Button>
+    </div>
   );
 };
 

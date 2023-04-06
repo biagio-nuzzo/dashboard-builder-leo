@@ -8,15 +8,15 @@
   align-items: center;
   justify-content: center;
   background-color: #a09f9f;
-  width: calc(var(--width) + 500px);
+  width: calc(var(--width) + 800px);
   overflow: scroll;
-  padding: 100px;
+  padding: 300px;
 }
 
 /* ########## GLOBAL MENU ########## */
 
 .globalBuilderMenu {
-  width: calc((100vh - 200px));
+  width: var(--width);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -106,8 +106,8 @@
 .baseRow {
   border: 1px dashed black;
   width: 100%;
-  height: 100%;
   position: relative;
+  height: 100%;
 }
 
 .baseCol {
