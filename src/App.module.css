@@ -9,7 +9,6 @@
   justify-content: center;
   background-color: #a09f9f;
   width: calc(var(--width) + 500px);
-  height: 3000px;
   overflow: scroll;
   padding: 100px;
 }

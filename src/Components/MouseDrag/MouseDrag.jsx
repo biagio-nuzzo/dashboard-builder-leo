@@ -14,7 +14,7 @@ const MouseDrag = ({ children, style }) => {
 
   return (
     <div
-      style={style}
+      style={{ ...style, height: "100vh" }}
       className={Style.draggable}
       onMouseDown={(e) => {
         setIsDown(true);
