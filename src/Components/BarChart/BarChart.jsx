@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -51,8 +51,22 @@ const data = {
   ],
 };
 
-const BarChart = ({rows}) => {
-  return <Bar options={options} data={data} />;
+const BarChart = ({ rows, form }) => {
+  const chartTmp = <Bar options={options} data={data} />;
+  const [chart, setChart] = useState(chartTmp);
+
+  useEffect(() => {
+    setChart(null);
+  }, [rows, form.value]);
+
+  useEffect(() => {
+    if (!chart) {
+      setChart(chartTmp);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chart]);
+
+  return chart;
 };
 
 export default BarChart;

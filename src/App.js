@@ -34,8 +34,6 @@ const generateId = (elType = "row") => {
   return `${timestamp}-${random}-${randomString}-${elType}`;
 };
 
-// V0.1
-
 const generateBaseRow = () => {
   return {
     id: generateId(),
@@ -48,21 +46,29 @@ const generateBaseRow = () => {
   };
 };
 
-const componentsList = [
-  {
-    id: generateId("component"),
-    label: "Line Chart",
-    value: <LineChart />,
-  },
-  {
-    id: generateId("component"),
-    label: "Bar Chart",
-    value: <BarChart />,
-  },
-];
+// Constants
+const componentIds = {
+  lineChart: LineChart,
+  barChart: BarChart,
+};
+
+const maxRows = 6;
 
 function App() {
   const [rows, setRows] = useState([]);
+
+  const componentsList = [
+    {
+      id: generateId("component"),
+      label: "Line Chart",
+      value: "lineChart",
+    },
+    {
+      id: generateId("component"),
+      label: "Bar Chart",
+      value: "barChart",
+    },
+  ];
 
   const form = useForm({
     inputs: {
@@ -86,7 +92,9 @@ function App() {
       <div className={Style.mainContainer}>
         <div className={Style.globalBuilderMenu}>
           <Button
+            disabled={rows.length >= maxRows}
             onClick={() => {
+              if (rows.length >= maxRows) return;
               setRows((rows) => {
                 const newRows = [...rows];
                 newRows.push(generateBaseRow());
@@ -106,59 +114,19 @@ function App() {
           </div>
         </div>
         <div className={Style.paper}>
-          <BaseRowGenerator rows={rows} setRows={setRows} form={form} />
+          <BaseRowGenerator
+            rows={rows}
+            setRows={setRows}
+            form={form}
+            componentsList={componentsList}
+          />
         </div>
       </div>
     </ThemeProvider>
   );
 }
 
-const BaseRow = ({ row, setRows, horizontalSpace }) => {
-  const colSize = 12 / row.columns.length;
-
-  return (
-    <div className={Style.rowContainer}>
-      <RowMenu setRows={setRows} row={row} />
-      <Row
-        className={Style.baseRow}
-        columnGap={{
-          horizontal: {
-            xs: horizontalSpace,
-            sm: horizontalSpace,
-            md: horizontalSpace,
-            lg: horizontalSpace,
-          },
-        }}
-      >
-        {row.columns.map((column, index) => {
-          return (
-            <Col
-              key={index}
-              column={column}
-              setRows={setRows}
-              sm={colSize}
-              className={Style.baseCol}
-            >
-              <ColMenu setRows={setRows} column={column} />
-              {column.element ? (
-                column.element
-              ) : (
-                <BaseColContent
-                  setRows={setRows}
-                  column={column}
-                  columns={row.columns}
-                  row={row}
-                />
-              )}
-            </Col>
-          );
-        })}
-      </Row>
-    </div>
-  );
-};
-
-const BaseRowGenerator = ({ rows, setRows, form }) => {
+const BaseRowGenerator = ({ rows, setRows, form, componentsList }) => {
   return (
     <div
       className={Style.rowsContainer}
@@ -173,6 +141,9 @@ const BaseRowGenerator = ({ rows, setRows, form }) => {
             setRows={setRows}
             row={row}
             horizontalSpace={form.values.horizontalSpace}
+            componentsList={componentsList}
+            rows={rows}
+            form={form}
           />
         );
       })}
@@ -180,7 +151,63 @@ const BaseRowGenerator = ({ rows, setRows, form }) => {
   );
 };
 
-const BaseColContent = ({ setRows, column, columns, row }) => {
+const BaseRow = ({
+  row,
+  rows,
+  setRows,
+  horizontalSpace,
+  componentsList,
+  form,
+}) => {
+  const colSize = 12 / row.columns.length;
+  const height = `calc(100% / ${rows.length > 1 ? rows.length : 1})`;
+
+  return (
+    <div
+      className={Style.rowContainer}
+      style={{
+        maxHeight: height,
+      }}
+    >
+      <RowMenu setRows={setRows} row={row} />
+      <Row
+        className={Style.baseRow}
+        columnGap={{
+          horizontal: {
+            xs: horizontalSpace,
+            sm: horizontalSpace,
+            md: horizontalSpace,
+            lg: horizontalSpace,
+          },
+        }}
+      >
+        {row.columns.map((column, index) => {
+          return (
+            <Col key={index} sm={colSize} className={Style.baseCol}>
+              <ColMenu setRows={setRows} column={column} />
+              {column.element ? (
+                React.createElement(componentIds[column.element], {
+                  rows: { rows },
+                  form: { form },
+                })
+              ) : (
+                <BaseColContent
+                  setRows={setRows}
+                  column={column}
+                  columns={row.columns}
+                  row={row}
+                  componentsList={componentsList}
+                />
+              )}
+            </Col>
+          );
+        })}
+      </Row>
+    </div>
+  );
+};
+
+const BaseColContent = ({ setRows, column, row, componentsList }) => {
   const [selectValue, setSelectValue] = useState(null);
   return (
     <div className={Style.baseColContent}>
