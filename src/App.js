@@ -59,7 +59,7 @@ const padding = 75;
 const paperHeight = 1400 * 1.41451 - padding;
 const zoomStep = 0.05;
 const zoomMax = 1.5;
-const zoomMin = 0.3;
+const zoomMin = 0.1;
 
 const componentIds = {
   lineChart: LineChart,
