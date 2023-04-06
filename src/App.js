@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 
+import { useScreenshot, createFileName } from "use-react-screenshot";
+
 // Libraries
 import {
   ThemeProvider,
@@ -104,6 +106,23 @@ function App() {
   // Refs
   const zoomRef = useRef(null);
   const focusRef = useRef(null);
+  const paperRef = useRef(null);
+
+  // Hooks
+  const [image, takeScreenShot] = useScreenshot({
+    type: "image/jpeg",
+    quality: 1.0,
+  });
+
+  const download = (image, { name = "img", extension = "jpg" } = {}) => {
+    const a = document.createElement("a");
+    a.href = image;
+    a.download = createFileName(extension, name);
+    a.click();
+  };
+
+  const downloadScreenshot = () =>
+    takeScreenShot(paperRef.current).then(download);
 
   // Effects
   useEffect(() => {
@@ -134,6 +153,7 @@ function App() {
             >
               Log Rows
             </Button>
+            <Button onClick={downloadScreenshot}>Export</Button>
             <Button
               disabled={rows.length >= maxRows}
               onClick={() => {
@@ -160,7 +180,7 @@ function App() {
               <InputField {...form.getInputProps("horizontalSpace")} />
             </div>
           </div>
-          <div className={Style.paper}>
+          <div id="paper" ref={paperRef} className={Style.paper}>
             <BaseRowGenerator
               rows={rows}
               setRows={setRows}
@@ -429,6 +449,7 @@ const GlobalSettings = ({ zoom, setZoom, focusRef }) => {
         setZoomIsChanging(null);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoomIsChanging, autoCenterOnZoom]);
 
   return (
