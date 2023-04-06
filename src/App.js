@@ -88,6 +88,7 @@ function App() {
   // States
   const [rows, setRows] = useState([]);
   const [zoom, setZoom] = useState(1);
+  const [removeNoise, setRemoveNoise] = useState(false);
 
   // Components
   const componentsList = [
@@ -156,6 +157,7 @@ function App() {
       inline: "center",
     });
   }, []);
+
   return (
     <ThemeProvider>
       <MouseDrag>
@@ -172,7 +174,19 @@ function App() {
             >
               Log Rows
             </Button>
-            <Button onClick={downloadScreenshot}>Export</Button>
+            <Button
+              onClick={() => {
+                setRemoveNoise(true);
+                setTimeout(() => {
+                  downloadScreenshot();
+                }, 300);
+                setTimeout(() => {
+                  setRemoveNoise(false);
+                }, 300);
+              }}
+            >
+              Export
+            </Button>
             <Button
               disabled={rows.length >= maxRows}
               onClick={() => {
@@ -205,6 +219,7 @@ function App() {
               setRows={setRows}
               form={form}
               componentsList={componentsList}
+              removeNoise={removeNoise}
             />
           </div>
         </div>
@@ -213,7 +228,13 @@ function App() {
   );
 }
 
-const BaseRowGenerator = ({ rows, setRows, form, componentsList }) => {
+const BaseRowGenerator = ({
+  rows,
+  setRows,
+  form,
+  componentsList,
+  removeNoise,
+}) => {
   return (
     <div
       className={Style.rowsContainer}
@@ -231,6 +252,7 @@ const BaseRowGenerator = ({ rows, setRows, form, componentsList }) => {
             componentsList={componentsList}
             rows={rows}
             form={form}
+            removeNoise={removeNoise}
           />
         );
       })}
@@ -245,6 +267,7 @@ const BaseRow = ({
   rows,
   componentsList,
   form,
+  removeNoise,
 }) => {
   // Sizes
   const sumOfColSizes = row.columns.reduce((acc, col) => acc + col.colSize, 0);
@@ -264,7 +287,13 @@ const BaseRow = ({
         height: height,
       }}
     >
-      <RowMenu setRows={setRows} row={row} rows={rows} modalRef={modalRowRef} />
+      <RowMenu
+        setRows={setRows}
+        row={row}
+        rows={rows}
+        modalRef={modalRowRef}
+        removeNoise={removeNoise}
+      />
       <Row
         className={Style.baseRow}
         columnGap={{
@@ -286,6 +315,7 @@ const BaseRow = ({
                 setRows={setRows}
                 column={column}
                 modalRef={modalColRef}
+                removeNoise={removeNoise}
               />
               {column.element ? (
                 React.createElement(componentIds[column.element], {
@@ -335,12 +365,17 @@ const BaseColContent = ({ setRows, column, row, componentsList }) => {
   );
 };
 
-const RowMenu = ({ row, rows, setRows, modalRef }) => {
+const RowMenu = ({ row, rows, setRows, modalRef, removeNoise }) => {
   const modalBody = (
     <RowSettings row={row} setRows={setRows} modalRef={modalRef} rows={rows} />
   );
   return (
-    <span className={Style.menuRowButtonsContainer}>
+    <span
+      className={Style.menuRowButtonsContainer}
+      style={{
+        opacity: removeNoise ? 0 : 1,
+      }}
+    >
       <MagicModal ref={modalRef} />
       <span>
         <IoMdAddCircleOutline
@@ -379,7 +414,7 @@ const RowMenu = ({ row, rows, setRows, modalRef }) => {
   );
 };
 
-const ColMenu = ({ column, row, setRows, modalRef }) => {
+const ColMenu = ({ column, row, setRows, modalRef, removeNoise }) => {
   const modalBody = (
     <ColSettings
       row={row}
@@ -389,7 +424,12 @@ const ColMenu = ({ column, row, setRows, modalRef }) => {
     />
   );
   return (
-    <span className={Style.menuColButtonsContainer}>
+    <span
+      className={Style.menuColButtonsContainer}
+      style={{
+        opacity: removeNoise ? 0 : 1,
+      }}
+    >
       <MagicModal ref={modalRef} />
       <span>
         <IoIosRemoveCircleOutline
