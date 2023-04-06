@@ -3,7 +3,7 @@ import React, { useState } from "react";
 // Styles
 import Style from "./MouseDrag.module.css";
 
-const MouseDrag = ({ children, style }) => {
+const MouseDrag = ({ children, style, scrollRef }) => {
   const [isDown, setIsDown] = useState(false);
 
   const [startX, setStartX] = useState(0);
@@ -14,6 +14,7 @@ const MouseDrag = ({ children, style }) => {
 
   return (
     <div
+      ref={scrollRef}
       style={{ ...style, height: "100vh" }}
       className={Style.draggable}
       onMouseDown={(e) => {
@@ -37,18 +38,21 @@ const MouseDrag = ({ children, style }) => {
         e.currentTarget.classList.remove(Style.active);
       }}
       onMouseMove={(e) => {
-        if (!isDown) return;
-        e.preventDefault();
+        if (!isDown) {
+          return;
+        } else {
+          e.preventDefault();
 
-        // Horizontal
-        const x = e.pageX - e.currentTarget.offsetLeft;
-        const walk = (x - startX) * 1;
-        e.currentTarget.scrollLeft = scrollLeft - walk;
+          // Horizontal
+          const x = e.pageX - e.currentTarget.offsetLeft;
+          const walk = (x - startX) * 1;
+          e.currentTarget.scrollLeft = scrollLeft - walk;
 
-        // Vertical
-        const y = e.pageY - e.currentTarget.offsetTop;
-        const walkY = (y - startY) * 1;
-        e.currentTarget.scrollTop = scrollDown - walkY;
+          // Vertical
+          const y = e.pageY - e.currentTarget.offsetTop;
+          const walkY = (y - startY) * 1;
+          e.currentTarget.scrollTop = scrollDown - walkY;
+        }
       }}
     >
       {children}

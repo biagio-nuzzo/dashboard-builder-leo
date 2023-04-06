@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 // Libraries
 import {
@@ -60,8 +60,11 @@ const componentIds = {
 };
 
 function App() {
+  // States
   const [rows, setRows] = useState([]);
+  const [zoom, setZoom] = useState(1);
 
+  // Components
   const componentsList = [
     {
       id: generateId("component"),
@@ -75,6 +78,7 @@ function App() {
     },
   ];
 
+  // Form
   const form = useForm({
     inputs: {
       verticalSpace: {
@@ -92,17 +96,63 @@ function App() {
     },
   });
 
+  // Refs
+  const zoomRef = useRef(null);
+  const focusRef = useRef(null);
+
+  // Effects
+  useEffect(() => {
+    console.log(zoom);
+    zoomRef.current.style.zoom = zoom;
+  }, [zoom]);
+
+  useEffect(() => {
+    focusRef.current.focus();
+  }, []);
   return (
     <ThemeProvider>
       <MouseDrag>
-        <div className={Style.mainContainer}>
+        <div ref={zoomRef} className={Style.mainContainer}>
           <div className={Style.globalBuilderMenu}>
+            <div className={Style.focusInput}>
+              <input ref={focusRef} />
+            </div>
             <Button
               onClick={() => {
                 console.log(rows);
               }}
             >
               Log Rows
+            </Button>
+            <Button
+              onClick={() => {
+                focusRef.current.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                  inline: "center",
+                });
+              }}
+            >
+              Center
+            </Button>
+            <Button
+              onClick={() => {
+                setZoom((zoom) => {
+                  return zoom + 0.03;
+                });
+              }}
+            >
+              Zoom in
+            </Button>
+
+            <Button
+              onClick={() => {
+                setZoom((zoom) => {
+                  return zoom - 0.03;
+                });
+              }}
+            >
+              Zoom out
             </Button>
             <Button
               disabled={rows.length >= maxRows}
@@ -180,14 +230,10 @@ const BaseRow = ({
 }) => {
   // Sizes
   const colSize = 12 / row.columns.length;
-
   const sumOfRowSizes = rows.reduce((acc, row) => acc + row.rowSize, 0);
-
   const height =
     (paperHeight - form.values.verticalSpace * (sumOfRowSizes - 1)) *
     (row.rowSize / sumOfRowSizes);
-
-  console.log(height);
 
   // Refs
   const modalRef = useRef(null);
