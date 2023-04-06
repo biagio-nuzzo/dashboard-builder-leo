@@ -14,6 +14,7 @@ import useForm from "@hybris-software/use-ful-form";
 // Components
 import LineChart from "./Components/LineChart/LineChart";
 import BarChart from "./Components/BarChart/BarChart";
+import MouseDrag from "./Components/MouseDrag/MouseDrag";
 
 // Icons
 import {
@@ -89,39 +90,48 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className={Style.mainContainer}>
-        <div className={Style.globalBuilderMenu}>
-          <Button
-            disabled={rows.length >= maxRows}
-            onClick={() => {
-              if (rows.length >= maxRows) return;
-              setRows((rows) => {
-                const newRows = [...rows];
-                newRows.push(generateBaseRow());
-                return newRows;
-              });
-            }}
-          >
-            Add Row
-          </Button>
-          <div className={Style.inputFieldContainer}>
-            <label>Vertical space between rows</label>
-            <InputField {...form.getInputProps("verticalSpace")} />
+      <MouseDrag>
+        <div className={Style.mainContainer}>
+          <div className={Style.globalBuilderMenu}>
+            <Button
+              onClick={() => {
+                console.log(rows);
+              }}
+            >
+              Log Rows
+            </Button>
+            <Button
+              disabled={rows.length >= maxRows}
+              onClick={() => {
+                if (rows.length >= maxRows) return;
+                setRows((rows) => {
+                  const newRows = [...rows];
+                  newRows.push(generateBaseRow());
+                  return newRows;
+                });
+              }}
+            >
+              Add Row
+            </Button>
+            <div className={Style.inputFieldContainer}>
+              <label>Vertical space between rows</label>
+              <InputField {...form.getInputProps("verticalSpace")} />
+            </div>
+            <div className={Style.inputFieldContainer}>
+              <label>Horizontal space between columns</label>
+              <InputField {...form.getInputProps("horizontalSpace")} />
+            </div>
           </div>
-          <div className={Style.inputFieldContainer}>
-            <label>Horizontal space between columns</label>
-            <InputField {...form.getInputProps("horizontalSpace")} />
+          <div className={Style.paper}>
+            <BaseRowGenerator
+              rows={rows}
+              setRows={setRows}
+              form={form}
+              componentsList={componentsList}
+            />
           </div>
         </div>
-        <div className={Style.paper}>
-          <BaseRowGenerator
-            rows={rows}
-            setRows={setRows}
-            form={form}
-            componentsList={componentsList}
-          />
-        </div>
-      </div>
+      </MouseDrag>
     </ThemeProvider>
   );
 }
@@ -153,9 +163,9 @@ const BaseRowGenerator = ({ rows, setRows, form, componentsList }) => {
 
 const BaseRow = ({
   row,
-  rows,
   setRows,
   horizontalSpace,
+  rows,
   componentsList,
   form,
 }) => {

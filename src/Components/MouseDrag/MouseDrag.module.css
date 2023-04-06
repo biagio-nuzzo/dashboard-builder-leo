@@ -1,0 +1,7 @@
+.draggable {
+	overflow: scroll;
+}
+.draggable.active {
+	cursor: grabbing;
+	cursor: -webkit-grabbing;
+}

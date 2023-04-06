@@ -1,9 +1,17 @@
+:root {
+  --width: 1400px;
+}
+
 .mainContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background-color: #a09f9f;
+  width: calc(var(--width) + 500px);
+  height: 3000px;
+  overflow: scroll;
+  padding: 100px;
 }
 
 /* ########## GLOBAL MENU ########## */
@@ -26,8 +34,8 @@
 /* ########## END GLOBAL MENU ########## */
 
 .paper {
-  width: calc((100vh - 200px));
-  height: calc((100vh - 200px) * 1.41451);
+  width: var(--width);
+  height: calc(var(--width) * 1.41451);
   background-color: #ffffff;
   margin-block: 10px 50px;
   padding: 35px;
