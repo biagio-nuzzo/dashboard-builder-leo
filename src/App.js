@@ -300,10 +300,6 @@ const BaseRow = ({
     (paperHeight - form.values.verticalSpace * (sumOfRowSizes - 1)) *
     (row.rowSize / sumOfRowSizes);
 
-  // Refs
-  const modalRowRef = useRef(null);
-  const modalColRef = useRef(null);
-
   return (
     <div
       className={Style.rowContainer}
