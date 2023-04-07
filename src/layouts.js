@@ -1,5 +1,42 @@
 const layouts = [
   {
+    label: "2x2",
+    value: [
+      {
+        id: "1680875101-637-x213evn9t39-row",
+        rowSize: 1,
+        columns: [
+          {
+            id: "1680875101-871-r2u14tnpvrd-column",
+            colSize: 1,
+            element: null,
+          },
+          {
+            id: "1680875170-933-1nx4llfn62j-column",
+            element: null,
+            colSize: 1,
+          },
+        ],
+      },
+      {
+        id: "1680875101-711-a02wwuh7ocb-row",
+        rowSize: 1,
+        columns: [
+          {
+            id: "1680875101-671-c7ysuv00v9d-column",
+            colSize: 1,
+            element: null,
+          },
+          {
+            id: "1680875172-531-s8pa49totqf-column",
+            element: null,
+            colSize: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
     label: "3x2",
     value: [
       {
@@ -52,43 +89,7 @@ const layouts = [
       },
     ],
   },
-  {
-    label: "2x2",
-    value: [
-      {
-        id: "1680875101-637-x213evn9t39-row",
-        rowSize: 1,
-        columns: [
-          {
-            id: "1680875101-871-r2u14tnpvrd-column",
-            colSize: 1,
-            element: null,
-          },
-          {
-            id: "1680875170-933-1nx4llfn62j-column",
-            element: null,
-            colSize: 1,
-          },
-        ],
-      },
-      {
-        id: "1680875101-711-a02wwuh7ocb-row",
-        rowSize: 1,
-        columns: [
-          {
-            id: "1680875101-671-c7ysuv00v9d-column",
-            colSize: 1,
-            element: null,
-          },
-          {
-            id: "1680875172-531-s8pa49totqf-column",
-            element: null,
-            colSize: 1,
-          },
-        ],
-      },
-    ],
-  },
+
   {
     label: "4x2",
     value: [

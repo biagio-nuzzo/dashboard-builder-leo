@@ -131,6 +131,7 @@ function App() {
   const zoomRef = useRef(null);
   const focusRef = useRef(null);
   const paperRef = useRef(null);
+  const generalModalRef = useRef(null);
 
   // Hooks
   // eslint-disable-next-line no-unused-vars
@@ -166,6 +167,7 @@ function App() {
   return (
     <ThemeProvider>
       <MouseDrag>
+        <MagicModal ref={generalModalRef} />
         <GlobalSettings zoom={zoom} setZoom={setZoom} focusRef={focusRef} />
         <div className={Style.mainContainer}>
           <div ref={zoomRef}>
@@ -185,8 +187,9 @@ function App() {
                 items={layouts}
                 value={selectedLayout}
                 setValue={setSelectedLayout}
+                placeholder="Select Layout"
                 onSelectChange={(value) => {
-                  console.log("change")
+                  console.log("change");
                   setRows(value.value);
                 }}
               ></Select>
@@ -236,6 +239,7 @@ function App() {
                 form={form}
                 componentsList={componentsList}
                 removeNoise={removeNoise}
+                generalModalRef={generalModalRef}
               />
             </div>
           </div>
@@ -251,6 +255,7 @@ const BaseRowGenerator = ({
   form,
   componentsList,
   removeNoise,
+  generalModalRef,
 }) => {
   return (
     <div
@@ -270,6 +275,7 @@ const BaseRowGenerator = ({
             rows={rows}
             form={form}
             removeNoise={removeNoise}
+            generalModalRef={generalModalRef}
           />
         );
       })}
@@ -285,6 +291,7 @@ const BaseRow = ({
   componentsList,
   form,
   removeNoise,
+  generalModalRef
 }) => {
   // Sizes
   const sumOfColSizes = row.columns.reduce((acc, col) => acc + col.colSize, 0);
@@ -308,7 +315,7 @@ const BaseRow = ({
         setRows={setRows}
         row={row}
         rows={rows}
-        modalRef={modalRowRef}
+        modalRef={generalModalRef}
         removeNoise={removeNoise}
       />
       <Row
@@ -331,7 +338,7 @@ const BaseRow = ({
                 row={row}
                 setRows={setRows}
                 column={column}
-                modalRef={modalColRef}
+                modalRef={generalModalRef}
                 removeNoise={removeNoise}
               />
               {column.element ? (
@@ -393,7 +400,6 @@ const RowMenu = ({ row, rows, setRows, modalRef, removeNoise }) => {
         opacity: removeNoise ? 0 : 1,
       }}
     >
-      <MagicModal ref={modalRef} />
       <span>
         <IoMdAddCircleOutline
           className={Style.menuIcons}
@@ -447,7 +453,6 @@ const ColMenu = ({ column, row, setRows, modalRef, removeNoise }) => {
         opacity: removeNoise ? 0 : 1,
       }}
     >
-      <MagicModal ref={modalRef} />
       <span>
         <IoIosRemoveCircleOutline
           className={Style.menuIcons}
