@@ -29,6 +29,9 @@ import { RxCrossCircled } from "react-icons/rx";
 import { BiZoomIn, BiZoomOut } from "react-icons/bi";
 import { MdCenterFocusStrong } from "react-icons/md";
 
+// Constants
+import layouts from "./layouts";
+
 // Styles
 import Style from "./App.module.css";
 
@@ -75,8 +78,9 @@ const maxRows = 6;
 const maxColumns = 12;
 const padding = 75;
 const paperHeight = 1400 * 1.41451 - padding;
-const zoomStep = 0.05;
-const zoomMax = 1.5;
+const zoomStep = 0.1;
+const zoomStepSmoothing = 20;
+const zoomMax = 2;
 const zoomMin = 0.1;
 
 const componentIds = {
@@ -89,6 +93,7 @@ function App() {
   const [rows, setRows] = useState([]);
   const [zoom, setZoom] = useState(1);
   const [removeNoise, setRemoveNoise] = useState(false);
+  const [selectedLayout, setSelectedLayout] = useState(null);
 
   // Components
   const componentsList = [
@@ -162,65 +167,77 @@ function App() {
     <ThemeProvider>
       <MouseDrag>
         <GlobalSettings zoom={zoom} setZoom={setZoom} focusRef={focusRef} />
-        <div ref={zoomRef} className={Style.mainContainer}>
-          <div className={Style.globalBuilderMenu}>
-            <div className={Style.focusInput}>
-              <input ref={focusRef} />
+        <div className={Style.mainContainer}>
+          <div ref={zoomRef}>
+            <div className={Style.globalBuilderMenu}>
+              <div className={Style.focusInput}>
+                <input ref={focusRef} />
+              </div>
+              <Button
+                onClick={() => {
+                  console.log(rows);
+                  console.log(JSON.stringify(rows));
+                }}
+              >
+                Log Rows
+              </Button>
+              <Select
+                items={layouts}
+                value={selectedLayout}
+                setValue={setSelectedLayout}
+                onSelectChange={(value) => {
+                  console.log("change")
+                  setRows(value.value);
+                }}
+              ></Select>
+              <Button
+                onClick={() => {
+                  setRemoveNoise(true);
+                  setTimeout(() => {
+                    downloadScreenshot();
+                  }, 300);
+                  setTimeout(() => {
+                    setRemoveNoise(false);
+                  }, 300);
+                }}
+              >
+                Export
+              </Button>
+              <Button
+                disabled={rows.length >= maxRows}
+                onClick={() => {
+                  const sumOfRowSizes = rows.reduce(
+                    (acc, row) => acc + row.rowSize,
+                    0
+                  );
+                  if (sumOfRowSizes >= maxRows) return;
+                  setRows((rows) => {
+                    const newRows = [...rows];
+                    newRows.push(generateBaseRow());
+                    return newRows;
+                  });
+                }}
+              >
+                Add Row
+              </Button>
+              <div className={Style.inputFieldContainer}>
+                <label>Vertical space between rows</label>
+                <InputField {...form.getInputProps("verticalSpace")} />
+              </div>
+              <div className={Style.inputFieldContainer}>
+                <label>Horizontal space between columns</label>
+                <InputField {...form.getInputProps("horizontalSpace")} />
+              </div>
             </div>
-            <Button
-              onClick={() => {
-                console.log(rows);
-              }}
-            >
-              Log Rows
-            </Button>
-            <Button
-              onClick={() => {
-                setRemoveNoise(true);
-                setTimeout(() => {
-                  downloadScreenshot();
-                }, 300);
-                setTimeout(() => {
-                  setRemoveNoise(false);
-                }, 300);
-              }}
-            >
-              Export
-            </Button>
-            <Button
-              disabled={rows.length >= maxRows}
-              onClick={() => {
-                const sumOfRowSizes = rows.reduce(
-                  (acc, row) => acc + row.rowSize,
-                  0
-                );
-                if (sumOfRowSizes >= maxRows) return;
-                setRows((rows) => {
-                  const newRows = [...rows];
-                  newRows.push(generateBaseRow());
-                  return newRows;
-                });
-              }}
-            >
-              Add Row
-            </Button>
-            <div className={Style.inputFieldContainer}>
-              <label>Vertical space between rows</label>
-              <InputField {...form.getInputProps("verticalSpace")} />
+            <div id="paper" ref={paperRef} className={Style.paper}>
+              <BaseRowGenerator
+                rows={rows}
+                setRows={setRows}
+                form={form}
+                componentsList={componentsList}
+                removeNoise={removeNoise}
+              />
             </div>
-            <div className={Style.inputFieldContainer}>
-              <label>Horizontal space between columns</label>
-              <InputField {...form.getInputProps("horizontalSpace")} />
-            </div>
-          </div>
-          <div id="paper" ref={paperRef} className={Style.paper}>
-            <BaseRowGenerator
-              rows={rows}
-              setRows={setRows}
-              form={form}
-              componentsList={componentsList}
-              removeNoise={removeNoise}
-            />
           </div>
         </div>
       </MouseDrag>
@@ -616,28 +633,6 @@ const ColSettings = ({ column, row, setRows, modalRef }) => {
 };
 
 const GlobalSettings = ({ zoom, setZoom, focusRef }) => {
-  const [zoomIsChanging, setZoomIsChanging] = useState(null);
-  const [autoCenterOnZoom, setAutoCenterOnZoom] = useState(true);
-
-  useEffect(() => {
-    if (autoCenterOnZoom) {
-      if (zoomIsChanging) {
-        const timeout = setTimeout(() => {
-          setZoomIsChanging(false);
-        }, 750);
-        return () => clearTimeout(timeout);
-      } else if (zoomIsChanging === false) {
-        focusRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-          inline: "center",
-        });
-        setZoomIsChanging(null);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [zoomIsChanging, autoCenterOnZoom]);
-
   return (
     <div className={Style.settingsMenu}>
       <div
@@ -647,10 +642,14 @@ const GlobalSettings = ({ zoom, setZoom, focusRef }) => {
         }}
         onClick={() => {
           if (zoom >= zoomMax) return;
-          setZoom((zoom) => {
-            return zoom + zoomStep;
-          });
-          setZoomIsChanging(true);
+
+          for (let i = 0; i < zoomStepSmoothing; i++) {
+            setTimeout(() => {
+              setZoom((zoom) => {
+                return zoom + zoomStep / zoomStepSmoothing;
+              });
+            }, 10 * i);
+          }
         }}
       >
         <BiZoomIn />
@@ -662,10 +661,14 @@ const GlobalSettings = ({ zoom, setZoom, focusRef }) => {
         }}
         onClick={() => {
           if (zoom <= zoomMin) return;
-          setZoom((zoom) => {
-            return zoom - zoomStep;
-          });
-          setZoomIsChanging(true);
+
+          for (let i = 0; i < zoomStepSmoothing; i++) {
+            setTimeout(() => {
+              setZoom((zoom) => {
+                return zoom - zoomStep / zoomStepSmoothing;
+              });
+            }, 10 * i);
+          }
         }}
       >
         <BiZoomOut />
@@ -681,24 +684,6 @@ const GlobalSettings = ({ zoom, setZoom, focusRef }) => {
         }}
       >
         <MdCenterFocusStrong />
-      </div>
-      <div
-        className={Style.settingComponent}
-        onClick={() => {
-          setAutoCenterOnZoom(!autoCenterOnZoom);
-        }}
-      >
-        <div className={Style.settingsTooltip}>
-          <p>Enable auto center on zoom</p>
-        </div>
-        <input
-          style={{ cursor: "pointer" }}
-          type="checkbox"
-          checked={autoCenterOnZoom}
-          onChange={(e) => {
-            setAutoCenterOnZoom(e.target.checked);
-          }}
-        />
       </div>
     </div>
   );

@@ -77,26 +77,6 @@
   background-color: rgb(255, 255, 255);
 }
 
-.settingsTooltip {
-  position: absolute;
-  top: 8px;
-  right: 55px;
-  background-color: rgb(255, 255, 255);
-  border: 1px solid rgb(182, 182, 182);
-  border-radius: 5px;
-  width: 180px;
-  text-align: center;
-  padding: 5px;
-  font-size: 12px;
-  transition: all 0.4s ease;
-  z-index: 100;
-  opacity: 0;
-}
-
-.settingComponent:hover .settingsTooltip {
-  opacity: 1;
-}
-
 .modalSection .inputLabel {
   font-size: 14px;
 }
