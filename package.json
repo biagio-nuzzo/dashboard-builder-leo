@@ -6,6 +6,7 @@
   "dependencies": {
     "@hybris-software/ui-kit": "^2.2.39",
     "@hybris-software/use-ful-form": "^2.2.1",
+    "@hybris-software/use-query": "^2.3.17",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
