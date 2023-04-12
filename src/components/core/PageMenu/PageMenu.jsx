@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 // Libraries
 import { Button, Select, InputField } from "@hybris-software/ui-kit";
@@ -14,7 +14,6 @@ import { maxRows } from "../../../data/settings";
 import Style from "./PageMenu.module.css";
 
 const PageMenu = ({
-  focusRef,
   paperRef,
   rows,
   setRows,
@@ -43,22 +42,8 @@ const PageMenu = ({
   const downloadScreenshot = () =>
     takeScreenShot(paperRef.current).then(download);
 
-  useEffect(() => {
-    if (focusRef?.current) {
-      focusRef.current.focus();
-      focusRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-        inline: "center",
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   return (
     <div className={Style.globalBuilderMenu}>
-      <div className={Style.focusInput}>
-        <input ref={focusRef} />
-      </div>
       <Button
         onClick={() => {
           console.log(rows);
