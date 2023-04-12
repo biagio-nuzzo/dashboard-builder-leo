@@ -16,6 +16,7 @@ const BaseRowGenerator = ({
   removeNoise,
   generalModalRef,
 }) => {
+  
   // Components List
   const componentsList = [
     {
