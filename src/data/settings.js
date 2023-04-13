@@ -9,7 +9,7 @@ const paperHeight = 1400 * 1.41451 - padding;
 const zoomStep = 0.1;
 const zoomStepSmoothing = 20;
 const zoomMax = 2;
-const zoomMin = 0.1;
+const zoomMin = 0.3;
 const headerHeight = 100;
 const footerHeight = 30;
 

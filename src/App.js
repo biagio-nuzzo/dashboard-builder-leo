@@ -34,7 +34,7 @@ function App() {
       rows: [],
       ref: paperOneRef,
       header: {
-        show: true,
+        show: false,
         image: null,
         imageOptions: {
           fullWidth: false,

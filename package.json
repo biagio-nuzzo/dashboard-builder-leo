@@ -1,7 +1,7 @@
 {
   "name": "dashboard-builder",
   "version": "0.1.0",
-  "homepage": "https://biagio-nuzzo.github.io/dashboard-builder",
+  "homepage": "https://biagio-nuzzo.github.io/dashboard-builder-leo",
   "private": true,
   "dependencies": {
     "@hybris-software/ui-kit": "^2.2.39",
