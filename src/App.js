@@ -10,12 +10,61 @@ import MouseDrag from "./components/core/MouseDrag/MouseDrag";
 import GlobalSettings from "./components/core/GlobalSettings/GlobalSettings";
 import PageBuilder from "./components/core/PageBuilder/PageBuilder";
 
+// Utils
+import { generateId } from "./utils/utils";
+
 // Styles
 import Style from "./App.module.css";
 
 function App() {
   // States
   const [zoom, setZoom] = useState(1);
+  const [pages, setPages] = useState([
+    {
+      id: generateId("page"),
+      rows: [],
+      header: {
+        show: true,
+        image: null,
+        imageOptions: {
+          fullWidth: false,
+        },
+        text: "",
+        textOptions: {
+          fontSize: 20,
+          bold: false,
+        },
+      },
+    },
+    {
+      id: generateId("page"),
+      rows: [],
+      header: {
+        show: false,
+        image: null,
+        imageOptions: {
+          fullWidth: false,
+        },
+        text: "",
+        textOptions: {
+          fontSize: 20,
+          bold: false,
+        },
+      },
+    },
+  ]);
+
+  const setPageRows = (pageIndex, rows) => {
+    return setPages((pages) => {
+      const newPages = [...pages];
+      if (typeof rows === "function") {
+        newPages[pageIndex].rows = rows(newPages[pageIndex].rows);
+      } else {
+        newPages[pageIndex].rows = rows;
+      }
+      return newPages;
+    });
+  };
 
   // Queries
   const layouts = useQuery({
@@ -23,10 +72,10 @@ function App() {
     method: "GET",
     executeImmediately: true,
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
     },
     onError: (error) => {
-      console.log(error);
+      // console.log(error);
     },
   });
 
@@ -34,10 +83,10 @@ function App() {
     url: "layouts/",
     method: "POST",
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
     },
     onError: (error) => {
-      console.log(error);
+      // console.log(error);
     },
   });
 
@@ -75,16 +124,19 @@ function App() {
             <div className={Style.focusInput}>
               <input ref={focusRef} />
             </div>
-            <PageBuilder
-              layouts={layouts}
-              layoutsPost={layoutsPost}
-              generalModalRef={generalModalRef}
-            />
-            <PageBuilder
-              layouts={layouts}
-              layoutsPost={layoutsPost}
-              generalModalRef={generalModalRef}
-            />
+            {pages.map((page, index) => (
+              <PageBuilder
+                key={page.id}
+                layouts={layouts}
+                layoutsPost={layoutsPost}
+                generalModalRef={generalModalRef}
+                rows={page.rows}
+                setRows={(rows) => setPageRows(index, rows)}
+                page={page}
+                setPages={setPages}
+                pageIndex={index}
+              />
+            ))}
           </div>
         </div>
       </MouseDrag>

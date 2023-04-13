@@ -1,0 +1,32 @@
+.menuRowButtonsContainer {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  top: 0px;
+  right: -30px;
+  z-index: 2;
+}
+
+.menuIcons {
+  font-size: 25px;
+  color: rgb(165, 165, 165);
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+
+.menuIcons:hover {
+  color: rgb(0, 0, 0);
+}
+
+.menuIconsDelete {
+  font-size: 24px;
+  color: rgb(165, 165, 165);
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+
+.menuIconsDelete:hover {
+  color: rgb(245, 20, 20);
+}

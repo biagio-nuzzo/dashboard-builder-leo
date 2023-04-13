@@ -35,4 +35,12 @@ const generateId = (elType = "row") => {
   return `${timestamp}-${random}-${randomString}-${elType}`;
 };
 
-export { numberToWord, generateBaseRow, generateId };
+function generateFontSizes(n, m) {
+  let arr = [];
+  for (let i = n; i <= m; i++) {
+    arr.push({ label: i, value: i });
+  }
+  return arr;
+}
+
+export { numberToWord, generateBaseRow, generateId, generateFontSizes };

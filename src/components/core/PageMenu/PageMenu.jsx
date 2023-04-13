@@ -21,6 +21,9 @@ const PageMenu = ({
   layouts,
   setRemoveNoise,
   form,
+  pageIndex,
+  page,
+  setPages,
 }) => {
   // States
   const [selectedLayout, setSelectedLayout] = useState(null);
@@ -45,12 +48,16 @@ const PageMenu = ({
   return (
     <div className={Style.globalBuilderMenu}>
       <Button
+        disabled={page.header.show}
         onClick={() => {
-          console.log(rows);
-          console.log(JSON.stringify(rows));
+          setPages((pages) => {
+            const newPages = [...pages];
+            newPages[pageIndex].header.show = true;
+            return newPages;
+          });
         }}
       >
-        Log Rows
+        Add Header
       </Button>
       <Button
         onClick={() => {

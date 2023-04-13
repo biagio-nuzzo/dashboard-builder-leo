@@ -8,7 +8,12 @@ import ColMenu from "../ColMenu/ColMenu";
 import { Row, Col, Select } from "@hybris-software/ui-kit";
 
 // Settings
-import { paperHeight, maxColumns, componentIds } from "../../../data/settings";
+import {
+  paperHeight,
+  maxColumns,
+  componentIds,
+  headerHeight,
+} from "../../../data/settings";
 
 // Styles
 import Style from "./BaseRow.module.css";
@@ -22,12 +27,16 @@ const BaseRow = ({
   form,
   removeNoise,
   generalModalRef,
+  page,
 }) => {
   // Sizes
   const sumOfColSizes = row.columns.reduce((acc, col) => acc + col.colSize, 0);
   const sumOfRowSizes = rows.reduce((acc, row) => acc + row.rowSize, 0);
+  const computedHeaderHeight = page.header.show ? headerHeight : 0;
   const height =
-    (paperHeight - form.values.verticalSpace * (sumOfRowSizes - 1)) *
+    (paperHeight -
+      computedHeaderHeight -
+      form.values.verticalSpace * (sumOfRowSizes - 1)) *
     (row.rowSize / sumOfRowSizes);
 
   return (

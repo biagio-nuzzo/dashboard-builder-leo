@@ -10,6 +10,7 @@ const zoomStep = 0.1;
 const zoomStepSmoothing = 20;
 const zoomMax = 2;
 const zoomMin = 0.1;
+const headerHeight = 100;
 
 const componentIds = {
   lineChart: LineChart,
@@ -25,5 +26,6 @@ export {
   zoomStepSmoothing,
   zoomMax,
   zoomMin,
+  headerHeight,
   componentIds,
 };

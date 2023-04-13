@@ -10,9 +10,17 @@ import PageMenu from "../PageMenu/PageMenu";
 // Styles
 import Style from "./PageBuilder.module.css";
 
-const PageBuilder = ({ layouts, layoutsPost, generalModalRef }) => {
+const PageBuilder = ({
+  layouts,
+  layoutsPost,
+  generalModalRef,
+  rows,
+  setRows,
+  page,
+  setPages,
+  pageIndex,
+}) => {
   // States
-  const [rows, setRows] = useState([]);
   const [removeNoise, setRemoveNoise] = useState(false);
 
   // Refs
@@ -46,9 +54,15 @@ const PageBuilder = ({ layouts, layoutsPost, generalModalRef }) => {
         layoutsPost={layoutsPost}
         setRemoveNoise={setRemoveNoise}
         form={form}
+        pageIndex={pageIndex}
+        page={page}
+        setPages={setPages}
       />
       <div id="paper" ref={paperRef} className={Style.paper}>
         <BaseRowGenerator
+          page={page}
+          setPages={setPages}
+          pageIndex={pageIndex}
           rows={rows}
           setRows={setRows}
           form={form}
