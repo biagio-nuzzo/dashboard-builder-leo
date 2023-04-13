@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/dashboard-builder-leo/static/css/main.83fab502.css",
-    "main.js": "/dashboard-builder-leo/static/js/main.69c606a7.js",
+    "main.css": "/dashboard-builder-leo/static/css/main.b8a7003d.css",
+    "main.js": "/dashboard-builder-leo/static/js/main.6901b79d.js",
     "static/js/703.cd3cf82c.chunk.js": "/dashboard-builder-leo/static/js/703.cd3cf82c.chunk.js",
     "static/js/513.0a350400.chunk.js": "/dashboard-builder-leo/static/js/513.0a350400.chunk.js",
     "index.html": "/dashboard-builder-leo/index.html",
-    "main.83fab502.css.map": "/dashboard-builder-leo/static/css/main.83fab502.css.map",
-    "main.69c606a7.js.map": "/dashboard-builder-leo/static/js/main.69c606a7.js.map",
+    "main.b8a7003d.css.map": "/dashboard-builder-leo/static/css/main.b8a7003d.css.map",
+    "main.6901b79d.js.map": "/dashboard-builder-leo/static/js/main.6901b79d.js.map",
     "703.cd3cf82c.chunk.js.map": "/dashboard-builder-leo/static/js/703.cd3cf82c.chunk.js.map",
     "513.0a350400.chunk.js.map": "/dashboard-builder-leo/static/js/513.0a350400.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.83fab502.css",
-    "static/js/main.69c606a7.js"
+    "static/css/main.b8a7003d.css",
+    "static/js/main.6901b79d.js"
   ]
 }
