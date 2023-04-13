@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 
 // Libraries
 import useForm from "@hybris-software/use-ful-form";
@@ -19,13 +19,10 @@ const PageBuilder = ({
   page,
   setPages,
   pageIndex,
+  paperRef,
+  removeNoise,
+  setRemoveNoise,
 }) => {
-  // States
-  const [removeNoise, setRemoveNoise] = useState(false);
-
-  // Refs
-  const paperRef = useRef(null);
-
   // Form
   const form = useForm({
     inputs: {

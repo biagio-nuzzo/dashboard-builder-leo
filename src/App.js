@@ -17,12 +17,22 @@ import { generateId } from "./utils/utils";
 import Style from "./App.module.css";
 
 function App() {
+  // Refs
+  const zoomRef = useRef(null);
+  const focusRef = useRef(null);
+  const generalModalRef = useRef(null);
+  const paperOneRef = useRef(null);
+  const paperTwoRef = useRef(null);
+
   // States
   const [zoom, setZoom] = useState(1);
+  const [removeNoise, setRemoveNoise] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [pages, setPages] = useState([
     {
       id: generateId("page"),
       rows: [],
+      ref: paperOneRef,
       header: {
         show: true,
         image: null,
@@ -39,6 +49,7 @@ function App() {
     {
       id: generateId("page"),
       rows: [],
+      ref: paperTwoRef,
       header: {
         show: false,
         image: null,
@@ -90,11 +101,6 @@ function App() {
     },
   });
 
-  // Refs
-  const zoomRef = useRef(null);
-  const focusRef = useRef(null);
-  const generalModalRef = useRef(null);
-
   // Effects
   useEffect(() => {
     if (zoomRef?.current) {
@@ -118,8 +124,21 @@ function App() {
     <ThemeProvider>
       <MouseDrag>
         <MagicModal ref={generalModalRef} />
-        <GlobalSettings zoom={zoom} setZoom={setZoom} focusRef={focusRef} />
+        <GlobalSettings
+          zoom={zoom}
+          setZoom={setZoom}
+          focusRef={focusRef}
+          setLoader={setLoader}
+          setRemoveNoise={setRemoveNoise}
+          paperOneRef={paperOneRef}
+          paperTwoRef={paperTwoRef}
+        />
         <div className={Style.mainContainer}>
+          {loader && (
+            <div className={Style.exportLoaderContainer}>
+              <div className={Style.exportLoader}></div>
+            </div>
+          )}
           <div className={Style.pagesContainer} ref={zoomRef}>
             <div className={Style.focusInput}>
               <input ref={focusRef} />
@@ -135,6 +154,9 @@ function App() {
                 page={page}
                 setPages={setPages}
                 pageIndex={index}
+                paperRef={page.ref}
+                removeNoise={removeNoise}
+                setRemoveNoise={setRemoveNoise}
               />
             ))}
           </div>

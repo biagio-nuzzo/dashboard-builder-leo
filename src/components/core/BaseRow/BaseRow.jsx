@@ -13,6 +13,7 @@ import {
   maxColumns,
   componentIds,
   headerHeight,
+  footerHeight,
 } from "../../../data/settings";
 
 // Styles
@@ -36,6 +37,7 @@ const BaseRow = ({
   const height =
     (paperHeight -
       computedHeaderHeight -
+      footerHeight -
       form.values.verticalSpace * (sumOfRowSizes - 1)) *
     (row.rowSize / sumOfRowSizes);
 
@@ -55,6 +57,9 @@ const BaseRow = ({
       />
       <Row
         className={Style.baseRow}
+        style={{
+          border: removeNoise ? "none" : "1px dashed black",
+        }}
         columnGap={{
           horizontal: {
             xs: horizontalSpace,

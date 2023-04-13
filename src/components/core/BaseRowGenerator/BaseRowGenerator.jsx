@@ -9,6 +9,7 @@ import { generateId } from "../../../utils/utils";
 
 // Styles
 import Style from "./BaseRowGenerator.module.css";
+import Footer from "../Footer/Footer";
 
 const BaseRowGenerator = ({
   rows,
@@ -38,7 +39,7 @@ const BaseRowGenerator = ({
     <div
       className={Style.rowsContainer}
       style={{
-        gap: rows.length > 1 ? `${form.values.verticalSpace}px` : 0,
+        gap: form.values.verticalSpace,
       }}
     >
       {page.header.show && (
@@ -65,6 +66,8 @@ const BaseRowGenerator = ({
           />
         );
       })}
+
+      <Footer pageIndex={pageIndex} />
     </div>
   );
 };

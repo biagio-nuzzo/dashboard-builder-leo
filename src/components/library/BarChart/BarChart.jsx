@@ -57,7 +57,7 @@ const BarChart = ({ rows, form }) => {
 
   useEffect(() => {
     setChart(null);
-  }, [rows, form.value]);
+  }, [rows, form.values]);
 
   useEffect(() => {
     if (!chart) {

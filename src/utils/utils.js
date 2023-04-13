@@ -1,3 +1,5 @@
+import jsPDF from "jspdf";
+
 const numberToWord = (number) => {
   const words = [
     "one",
@@ -43,4 +45,50 @@ function generateFontSizes(n, m) {
   return arr;
 }
 
-export { numberToWord, generateBaseRow, generateId, generateFontSizes };
+const generatePdfFromImages = (images) => {
+  const A4_PAPER_DIMENSIONS = {
+    width: 210,
+    height: 297,
+  };
+
+  const computedImages = images.map((image) => {
+    return {
+      src: image,
+      imageType: "JPEG",
+      width: A4_PAPER_DIMENSIONS.width,
+      height: A4_PAPER_DIMENSIONS.height,
+    };
+  });
+
+  const doc = new jsPDF();
+
+  doc.deletePage(1);
+
+  computedImages.forEach((image) => {
+    const imageDimensions = {
+      width: image.width,
+      height: image.height,
+    };
+
+    doc.addPage();
+    doc.addImage(
+      image.src,
+      "JPEG",
+      (A4_PAPER_DIMENSIONS.width - imageDimensions.width) / 2,
+      (A4_PAPER_DIMENSIONS.height - imageDimensions.height) / 2,
+      imageDimensions.width,
+      imageDimensions.height
+    );
+  });
+
+  const pdfURL = doc.output("bloburl");
+  window.open(pdfURL, "_blank");
+};
+
+export {
+  numberToWord,
+  generateBaseRow,
+  generateId,
+  generateFontSizes,
+  generatePdfFromImages,
+};

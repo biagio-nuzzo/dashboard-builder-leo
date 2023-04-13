@@ -22,7 +22,10 @@ const Header = ({ modalRef, setPages, pageIndex, removeNoise }) => {
   const [file, setFile] = useState(null);
 
   return (
-    <div style={{ height: headerHeight }} className={Style.headerContainer}>
+    <div
+      style={{ height: headerHeight }}
+      className={Style.headerContainer}
+    >
       <HeaderMenu
         removeNoise={removeNoise}
         setPages={setPages}
