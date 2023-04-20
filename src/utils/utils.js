@@ -53,10 +53,17 @@ const generatePdfFromImages = (images) => {
 
   const computedImages = images.map((image) => {
     return {
-      src: image,
+      src: image.image,
       imageType: "JPEG",
-      width: A4_PAPER_DIMENSIONS.width,
-      height: A4_PAPER_DIMENSIONS.height,
+      width:
+        image.orientation === "portrait"
+          ? A4_PAPER_DIMENSIONS.width
+          : A4_PAPER_DIMENSIONS.height,
+      height:
+        image.orientation === "portrait"
+          ? A4_PAPER_DIMENSIONS.height
+          : A4_PAPER_DIMENSIONS.width,
+      orientation: image.orientation,
     };
   });
 
@@ -70,12 +77,23 @@ const generatePdfFromImages = (images) => {
       height: image.height,
     };
 
-    doc.addPage();
+    const dimensions =
+      image.orientation === "portrait"
+        ? [
+            (A4_PAPER_DIMENSIONS.width - imageDimensions.width) / 2,
+            (A4_PAPER_DIMENSIONS.height - imageDimensions.height) / 2,
+          ]
+        : [
+            (A4_PAPER_DIMENSIONS.height - imageDimensions.width) / 2,
+            (A4_PAPER_DIMENSIONS.width - imageDimensions.height) / 2,
+          ];
+
+    doc.addPage("pdf", image.orientation);
     doc.addImage(
       image.src,
       "JPEG",
-      (A4_PAPER_DIMENSIONS.width - imageDimensions.width) / 2,
-      (A4_PAPER_DIMENSIONS.height - imageDimensions.height) / 2,
+      dimensions[0],
+      dimensions[1],
       imageDimensions.width,
       imageDimensions.height
     );

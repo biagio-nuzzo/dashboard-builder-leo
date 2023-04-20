@@ -24,6 +24,8 @@ function App() {
   const paperOneRef = useRef(null);
   const paperTwoRef = useRef(null);
 
+  const refsList = [paperOneRef, paperTwoRef];
+
   // States
   const [zoom, setZoom] = useState(1);
   const [removeNoise, setRemoveNoise] = useState(false);
@@ -32,7 +34,7 @@ function App() {
     {
       id: generateId("page"),
       rows: [],
-      ref: paperOneRef,
+      portrait: true,
       header: {
         show: false,
         image: null,
@@ -49,7 +51,7 @@ function App() {
     {
       id: generateId("page"),
       rows: [],
-      ref: paperTwoRef,
+      portrait: true,
       header: {
         show: false,
         image: null,
@@ -130,8 +132,9 @@ function App() {
           focusRef={focusRef}
           setLoader={setLoader}
           setRemoveNoise={setRemoveNoise}
-          paperOneRef={paperOneRef}
-          paperTwoRef={paperTwoRef}
+          paperOneRef={refsList[0]}
+          paperTwoRef={refsList[1]}
+          pages={pages}
         />
         <div className={Style.mainContainer}>
           {loader && (
@@ -154,7 +157,7 @@ function App() {
                 page={page}
                 setPages={setPages}
                 pageIndex={index}
-                paperRef={page.ref}
+                paperRef={refsList[index]}
                 removeNoise={removeNoise}
                 setRemoveNoise={setRemoveNoise}
               />

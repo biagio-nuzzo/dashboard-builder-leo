@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 // Libraries
 import useForm from "@hybris-software/use-ful-form";
@@ -23,6 +23,21 @@ const PageBuilder = ({
   removeNoise,
   setRemoveNoise,
 }) => {
+  // Memo
+  const sizes = useMemo(() => {
+    if (page.portrait) {
+      return {
+        width: 1400,
+        height: 1400 * 1.41451,
+      };
+    } else {
+      return {
+        width: 1400 * 1.41451,
+        height: 1400,
+      };
+    }
+  }, [page.portrait]);
+
   // Form
   const form = useForm({
     inputs: {
@@ -55,7 +70,15 @@ const PageBuilder = ({
         page={page}
         setPages={setPages}
       />
-      <div id="paper" ref={paperRef} className={Style.paper}>
+      <div
+        id="paper"
+        ref={paperRef}
+        className={Style.paper}
+        style={{
+          width: sizes.width,
+          height: sizes.height,
+        }}
+      >
         <BaseRowGenerator
           page={page}
           setPages={setPages}

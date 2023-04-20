@@ -69,6 +69,19 @@ const PageMenu = ({
       >
         Save Layout
       </Button>
+      <label htmlFor="portrait">Portrait</label>
+      <input
+        id="portrait"
+        type="checkbox"
+        defaultChecked={true}
+        onChange={() =>
+          setPages((pages) => {
+            const newPages = [...pages];
+            newPages[pageIndex].portrait = !newPages[pageIndex].portrait;
+            return newPages;
+          })
+        }
+      />
       <Select
         items={layouts?.response?.data}
         labelKey="name"

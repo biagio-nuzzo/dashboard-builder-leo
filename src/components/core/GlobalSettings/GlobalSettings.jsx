@@ -30,6 +30,7 @@ const GlobalSettings = ({
   setRemoveNoise,
   paperOneRef,
   paperTwoRef,
+  pages,
 }) => {
   // Hooks
   // eslint-disable-next-line no-unused-vars
@@ -57,7 +58,16 @@ const GlobalSettings = ({
             const image2 = await downloadScreenshot({
               paperRef: paperTwoRef,
             });
-            generatePdfFromImages([image1, image2]);
+            generatePdfFromImages([
+              {
+                image: image1,
+                orientation: pages[0].portrait ? "portrait" : "l",
+              },
+              {
+                image: image2,
+                orientation: pages[1].portrait ? "portrait" : "l",
+              },
+            ]);
             setTimeout(() => {
               setRemoveNoise(false);
               setLoader(false);
