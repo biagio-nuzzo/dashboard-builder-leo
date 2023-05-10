@@ -5,7 +5,7 @@ import BarChart from "../components/library/BarChart/BarChart";
 const maxRows = 6;
 const maxColumns = 12;
 const padding = 75;
-const paperHeight = 1400 * 1.41451 - padding;
+const paperHeight = 1400 * 1.41451 - padding; // NOT TOCCARE
 const zoomStep = 0.1;
 const zoomStepSmoothing = 20;
 const zoomMax = 2;

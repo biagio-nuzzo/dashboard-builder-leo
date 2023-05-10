@@ -55,6 +55,8 @@ const BarChart = ({ rows, form }) => {
   const chartTmp = <Bar options={options} data={data} />;
   const [chart, setChart] = useState(chartTmp);
 
+  // QUI DENTRO CHIAMATA API MI RACCOMANDO
+
   useEffect(() => {
     setChart(null);
   }, [rows, form.values]);
